@@ -1,17 +1,17 @@
 faster-eTaPR
 ============
 
-.. image:: https://readthedocs.org/projects/faster-etapr/badge/?version=latest
-    :target: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+|docs|_ |pre-commit|_ |mypy|_
 
-.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
-    :target: https://github.com/pre-commit/pre-commit
-    :alt: pre-commit enabled
+.. |docs| image:: https://readthedocs.org/projects/faster-etapr/badge/?version=latest
+.. _docs: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
 
-.. image:: http://www.mypy-lang.org/static/mypy_badge.svg
-    :target: http://mypy-lang.org/
-    :alt: Checked with mypy
+.. |pre-commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+.. _pre-commit: https://github.com/pre-commit/pre-commit
+
+.. |mypy| image:: http://www.mypy-lang.org/static/mypy_badge.svg
+.. _mypy: http://mypy-lang.org/
+
 
 Faster implementation (~100x) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
 The original implementation is `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_.
@@ -36,24 +36,24 @@ The following illustration (a recreation from the `paper <https://dl.acm.org/doi
 Note that for case 4, we could still mark the anomaly as detected, if there were more predictions which overlap with the anomaly :math:`A_4`.
 Specifically, the handling of the cases 3 and 4 is what sets eTaPR apart from other scoring methods.
 
-If you want an indepth explanation of the calculation, check out the `documentation <https://faster-etapr.readthedocs.io/>`_.
+If you want an in-depth explanation of the calculation, check out the `documentation <https://faster-etapr.readthedocs.io/>`_.
 
 Getting Started
 ---------------
 
 Until this package is released on PyPI, you can install it directly from Github, using `pip <https://github.com/pypa/pip>`_ or `uv <https://github.com/astral-sh/uv>`_:
 
-.. code-block:: bash
+.. code::
 
     pip install git+https://github.com/GPla/faster-eTaPR.git
 
-.. code-block:: bash
+.. code::
 
     uv pip install git+https://github.com/GPla/faster-eTaPR.git
 
 Now, you run your evaluation in python:
 
-.. code-block:: python
+.. code::
 
     import faster_etapr
     faster_etapr.evaluate_from_ranges(
