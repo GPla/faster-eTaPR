@@ -12,15 +12,16 @@ from .utils import check_floats
 eps = 1e-12
 
 __all__ = [
-    'eTa',
-    'calculate_from_preds',
-    'calculate_from_ranges',
+    'eTaMetrics',
+    'evaluate_from_preds',
+    'evaluate_from_ranges',
 ]
 
 
-class eTa:
-    """Defines the enhanced time-aware (eTa) precision, recall, and f1.
-    Moreover, we can also compute the point-wise and
+class eTaMetrics:
+    """Defines the `enhanced time-aware (eTa)
+    <https://dl.acm.org/doi/10.1145/3477314.3507024>`_ precision, recall, and
+    f1. Moreover, we can also compute the point-wise and
     `point-adjusted <https://arxiv.org/abs/1802.03903>`_ versions.
 
     **Motivation**: Anomaly detection is a case of binary classification. As
@@ -139,10 +140,20 @@ class eTa:
     partially overlaps with an anomaly `A_i`. It can be partially a TP and
     partially a FP. eTaPR (enhanced time-aware precision and recall)
     proposed by
-    `Hwang et al. <https://dl.acm.org/doi/abs/10.1145/3477314.3507024>`_ tackle
-    this problem in two ways.
+    `Hwang et al. <https://dl.acm.org/doi/abs/10.1145/3477314.3507024>`_
+    tackles this problem in two ways.
 
     TODO: finish motivation.
+
+    Attributes:
+        preds (list[tuple[int, int]]): Predictions as a list of ranges.
+        labels (list[tuple[int, int]]): Labels as a list of ranges.
+        theta_p (float, optional): Precision threshold. Only those
+              predictions who overlap with at least `theta_p` with a detected
+              anomaly are counted as correct. Defaults to 0.5.
+        theta_r (float, optional): Recall threshold. Only those anomalies
+            which overlap at least `theta_r` with an correct prediction are
+            counted as detected.  Defaults to 0.1.
     """
 
     def __init__(
@@ -153,7 +164,6 @@ class eTa:
         theta_p: float = 0.5,
         theta_r: float = 0.1,
     ):
-
         check_floats(
             ('theta_p', theta_p),
             ('theta_r', theta_r),
@@ -245,7 +255,8 @@ class eTa:
                 break
 
     def recall(self) -> eTaRecall:
-        """Calculates the enhanced time-aware recall (eTaR). Recall answers the
+        """Calculates the `enhanced time-aware recall (eTaR)
+        <https://dl.acm.org/doi/10.1145/3477314.3507024>`_. Recall answers the
         question of "How much of anomalies is detected?"
 
         The recall :math:`\\mathrm{RC}^\\mathrm{eTa}` is calculated as a
@@ -312,7 +323,7 @@ class eTa:
         """
 
         if len(self.labels) == 0 or len(self.preds) == 0:
-            return 0.0, np.zeros(len(self.labels)), []
+            return eTaRecall(0.0, 0.0, 0.0, 0)
 
         rec_portion = self._overlap_score_mat.sum(axis=1) / (
             self._labels_max_score
@@ -338,7 +349,8 @@ class eTa:
         )
 
     def precision(self) -> eTaPrecision:
-        """Calculates the enhanced time-aware precision (eTaP). Precision
+        """Calculates the `enhanced time-aware precision (eTaP)
+        <https://dl.acm.org/doi/10.1145/3477314.3507024>`_. Precision
         answers the question of "How many predictions (for anomalies) concern
         real anomalies?".
 
@@ -423,7 +435,7 @@ class eTa:
 
         """
         if len(self.labels) == 0 or len(self.preds) == 0:
-            return 0.0, np.zeros(len(self.labels)), []
+            return eTaPrecision(0.0, 0.0, 0.0, 0)
 
         preds_portion = (
             self._overlap_score_mat.sum(axis=0) / self._preds_max_score
@@ -529,7 +541,10 @@ class eTa:
     def point_precision(self) -> float:
         """Calculates the point-wise precision score. Precision answers the
         question of "How many predictions (for anomalies) concern real
-        anomalies?" and is mathematically defined as ``TP / (TP + FP)``.
+        anomalies?". In a point-wise manner, we categorize each prediction
+        into true positives (TP), false positives (FP), true negative (TN),
+        and false negatives (TN). Then we can calculate the precision as
+        as ``TP / (TP + FP)``.
 
         Returns:
             float: Returns the point-wise precision.
@@ -540,8 +555,10 @@ class eTa:
 
     def point_recall(self) -> float:
         """Calculates the point-wise recall score. Recall answers the question
-        of "How much of anomalies is detected?" and is mathematically defined
-        as ``TP / (TP + FN)``.
+        of "How much of anomalies is detected?".In a point-wise manner, we
+        categorize each prediction into true positives (TP), false positives
+        (FP), true negative (TN), and false negatives (TN). Then we can
+        calculate the recall as ``TP / (TP + FN)``.
 
         Returns:
             float: Returns the point-wise recall.
@@ -554,8 +571,33 @@ class eTa:
     def point_scores(self) -> dict[str, float | int]:
         """Calculates the point-wise (traditional) scores. Each data point can
         be categorized as either true positive (TP), false positive (FP),
-        true negative (TN) or false negative (FN). All keys in the
-        return mapping are prefixed with ``point/``.
+        true negative (TN) or false negative (FN). Then, we can calculate the
+        metrics as follows:
+
+        .. math::
+            :nowrap:
+
+            \\begin{align*}
+            \\mathrm{RC}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
+            \\triangleq \\frac{\\mathrm{TP}}{\\mathrm{TP} + \\mathrm{FN}} \\\\
+
+            \\mathrm{PR}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
+            \\triangleq \\frac{\\mathrm{TP}}{\\mathrm{TP} + \\mathrm{FP}} \\\\
+
+            \\mathrm{F1}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
+            \\triangleq 2 \\frac{\\mathrm{PR}^{\\mathrm{P}} \\cdot
+            \\mathrm{RC}^{\\mathrm{P}}}{\\mathrm{PR}^{\\mathrm{P}} +
+            \\mathrm{RC}^{\\mathrm{P}}} = \\frac{2 \\mathrm{TP}}{2\\mathrm{TP}
+            + \\mathrm{FP} + \\mathrm{FN}}\\\\
+
+            \\mathrm{SEG}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
+            \\triangleq
+            \\sum_{\\mathbf{A}_i \\in \\mathcal{A}} \\mathbb{1}(
+            \\sum_{\\mathbf{P}_j \\in \\mathcal{P}} |\\mathbf{P}_j \\cap
+            \\mathbf{A}_i| > 0)
+            \\end{align*}
+
+        All keys in the return mapping are prefixed with ``point/``.
 
         Returns:
             dict[str, float | int]: Returns a mapping containing:
@@ -598,8 +640,18 @@ class eTa:
             'point/segments': segments,
         }
 
-    def point_adjust_precision(self):
+    def point_adjust_precision(self) -> float:
+        """Calculates the `point-adjusted <https://arxiv.org/abs/1802.03903>`_
+        precision. Precision answers the question of how accurate our
+        predictions are. The point-adjusted precision is calculated in the
+        same way as the point-wise precision (TP / (TP + FP)). However, the
+        predictions are adjusted before calculation using the ground-truth.
+        All predictions for an anomaly are set to 1 if at least one correct
+        prediction for that anomaly segment exists.
 
+        Returns:
+            float: Returns the point-adjust precision.
+        """
         TPs = (
             np.clip(self._overlap_score_mat_org.sum(axis=1), 0, 1)
             * self._labels_max_score
@@ -609,7 +661,18 @@ class eTa:
 
         return TPs / (TPs + FPs)
 
-    def point_adjust_recall(self):
+    def point_adjust_recall(self) -> float:
+        """Calculates the `point-adjusted <https://arxiv.org/abs/1802.03903>`_
+        recall. Recall answers the question of how much of anomaly is detected.
+        The point-adjusted recall is calculated in the same way as the
+        point-wise recall (TP / (TP + FN)). However, the predictions are
+        adjusted before calculation using the ground-truth. All predictions
+        for an anomaly are set to 1 if at least one correct
+        prediction for that anomaly segment exists.
+
+        Returns:
+            float: Reutrns the point-adjusted recall.
+        """
         TPs = (
             np.clip(self._overlap_score_mat_org.sum(axis=1), 0, 1)
             * self._labels_max_score
@@ -617,8 +680,20 @@ class eTa:
 
         return TPs / self._labels_max_score.sum()
 
-    def point_adjust_scores(self):
+    def point_adjust_scores(self) -> dict[str, float]:
+        """Calculates the `point-adjusted <https://arxiv.org/abs/1802.03903>`_
+        recall, precision, and f1. The metrics are calculated in the same way
+        as the point-wise scores but the predictions are adjusted before
+        calculation using the ground-truth. All predictions for an anomaly are
+        set to 1 if at least one correct prediction for that anomaly segment
+        exists.
 
+        Returns:
+            dict[str, float]: Returns the point-adjusted scores:
+              - ``point_adjust/recall``: point-adjusted recall
+              - ``point_adjust/precision``: point-adjusted precision
+              - ``point_adjust/f1``: point-adjusted f1
+        """
         precision = self.point_adjust_precision()
         recall = self.point_adjust_recall()
 
@@ -633,12 +708,28 @@ class eTa:
     @classmethod
     def from_preds(
         cls,
-        y_hat: npt.NDArray[np.int_],
-        y: npt.NDArray[np.int_],
+        y_hat: npt.ArrayLike,
+        y: npt.ArrayLike,
         *,
         theta_p: float = 0.5,
         theta_r: float = 0.1,
-    ) -> 'eTa':
+    ) -> 'eTaMetrics':
+        """Creates an instance from point-wise predictions and labels.
+
+        Args:
+            y_hat (npt.ArrayLike): Predictions (point-wise).
+            y (npt.ArrayLike): Labels (point-wise).
+            theta_p (float, optional): Precision threshold. Only those
+              predictions who overlap with at least `theta_p` with a detected
+              anomaly are counted as correct. Defaults to 0.5.
+            theta_r (float, optional): Recall threshold. Only those anomalies
+              which overlap at least `theta_r` with an correct prediction are
+              counted as detected.  Defaults to 0.1.
+
+        Returns:
+            eTaMetrics: Returns an instance.
+        """
+
         y, y_hat = np.squeeze(y), np.squeeze(y_hat)
         check_ndim(y, y_hat, ndim=1)
         check_shape(y, y_hat)
@@ -646,31 +737,110 @@ class eTa:
         preds = mlnext.find_anomalies(y_hat)
         labels = mlnext.find_anomalies(y)
 
-        eta = eTa(preds, labels, theta_p=theta_p, theta_r=theta_r)
+        eta = eTaMetrics(preds, labels, theta_p=theta_p, theta_r=theta_r)
 
         return eta
 
 
-def calculate_from_preds(
-    y_hat: npt.NDArray[np.int_],
-    y: npt.NDArray[np.int_],
+def evaluate_from_preds(
+    y_hat: npt.ArrayLike,
+    y: npt.ArrayLike,
     *,
     theta_p: float = 0.5,
     theta_r: float = 0.1,
 ) -> dict[str, float | int]:
-    """Calculates the eTa, point-wise, and point-adjusted performance
-    metrics (and some other miscellaneous metrics).
+    """Calculates the `enhanced time-aware (eTa)
+    <https://dl.acm.org/doi/10.1145/3477314.3507024>`_, point-wise, and
+    `point-adjusted <https://arxiv.org/abs/1802.03903>`_ performance
+    metrics (and some other miscellaneous metrics). To see how these
+    metrics are calculated, check out the respective methods in
+    :class:`.eTaMetrics`.
 
     Args:
-        y_hat (npt.NDArray[np.int_]): Predictions (point-wise).
-        y (npt.NDArray[np.int_]): Labels (point-wise).
-        theta_p (float, optional): Precision theta. Defaults to 0.5.
-        theta_r (float, optional): Recall theta. Defaults to 0.1.
+        y_hat (npt.ArrayLike): Predictions (point-wise).
+        y (npt.ArrayLike): Labels (point-wise).
+        theta_p (float, optional): Precision threshold. Only those
+          predictions who overlap with at least `theta_p` with a detected
+          anomaly are counted as correct. Defaults to 0.5.
+        theta_r (float, optional): Recall threshold. Only those anomalies
+          which overlap at least `theta_r` with an correct prediction are
+          counted as detected.  Defaults to 0.1.
 
     Returns:
-        dict[str, float | int]: Returns a mapping with all metrics.
+        dict[str, float | int]: Returns a mapping with all metrics:
+          - ``eta/recall``: eTa recall score
+          - ``eta/recall_detection``: detection score of the recall
+          - ``eta/recall_portion``: portion score of the recall
+          - ``eta/detected_anomalies``: number of detected anomalies
+          - ``eta/precision``: eTa precision score
+          - ``eta/precision_detection``: detection score of the precision
+          - ``eta/precision_portion``: portion score of the precision
+          - ``eta/correct_predictions``: number of correct predictions
+          - ``eta/f1``: f1 score (harmonic mean of precision and recall)
+          - ``eta/TP``: number of true positives (points counted)
+          - ``eta/FP``: number of false positives (points counted)
+          - ``eta/FN``: number of false negatives (points counted)
+          - ``eta/wrong_predictions``: number of wrong predictions
+          - ``eta/missed_anomalies``: number of undetected anomalies
+          - ``eta/anomalies``: total number of anomalies
+          - ``eta/segments``: percentage of detected anomalies
+          - ``point/recall``: point-wise recall (TP / (TP + FN))
+          - ``point/precision``: point-wise precision (TP / (TP + FP))
+          - ``point/f1``: point-wise f1 score
+          - ``point/TP``: number of true positives, correctly classified as 1
+          - ``point/FP``: number of false positive, incorrectly classified as 1
+          - ``point/FN``: number of false negatives, incorrectly classified as
+            0
+          - ``point/anomalies``: total number of anomalies
+          - ``point/detected_anomalies``: number of detected anomalies (at
+            least one point detected)
+          - ``point/segments``: percentage of detected anomalies
+          - ``point_adjust/recall``: point-adjusted recall
+          - ``point_adjust/precision``: point-adjusted precision
+          - ``point_adjust/f1``: point-adjusted f1
+
+    Example:
+
+        >>> import faster_etapr
+        >>> faster_etapr.evaluate_from_ranges(
+        ...     y_hat=[0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+        ...     y=    [0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1],
+        ...     theta_p=0.5,
+        ...     theta_r=0.1,
+        ... )
+        {
+            'eta/recall': 0.3875,
+            'eta/recall_detection': 0.5,
+            'eta/recall_portion': 0.275,
+            'eta/detected_anomalies': 2.0,
+            'eta/precision': 0.46476766302377037,
+            'eta/precision_detection': 0.46476766302377037,
+            'eta/precision_portion': 0.46476766302377037,
+            'eta/correct_predictions': 2.0,
+            'eta/f1': 0.4226312395393011,
+            'eta/TP': 4,
+            'eta/FP': 5,
+            'eta/FN': 7,
+            'eta/wrong_predictions': 2,
+            'eta/missed_anomalies': 2,
+            'eta/anomalies': 4,
+            'eta/segments': 0.499999999999875,
+            'point/recall': 0.45454545454541323,
+            'point/precision': 0.5555555555554939,
+            'point/f1': 0.49999999999945494,
+            'point/TP': 5,
+            'point/FP': 4,
+            'point/FN': 6,
+            'point/anomalies': 4,
+            'point/detected_anomalies': 3.0,
+            'point/segments': 0.75,
+            'point_adjust/recall': 0.9090909090909091,
+            'point_adjust/precision': 0.7142857142857143,
+            'point_adjust/f1': 0.7999999999995071
+        }
+
     """
-    eta = eTa.from_preds(
+    eta = eTaMetrics.from_preds(
         y_hat=y_hat,
         y=y,
         theta_p=theta_p,
@@ -684,26 +854,110 @@ def calculate_from_preds(
     }
 
 
-def calculate_from_ranges(
+def evaluate_from_ranges(
     preds: list[tuple[int, int]],
     labels: list[tuple[int, int]],
     *,
     theta_p: float = 0.5,
     theta_r: float = 0.1,
 ) -> dict[str, float | int]:
-    """Calculates the eTa, point-wise, and point-adjusted performance
-    metrics (and some other miscellaneous metrics).
+    """Calculates the `enhanced time-aware (eTa)
+    <https://dl.acm.org/doi/10.1145/3477314.3507024>`_, point-wise, and
+    `point-adjusted <https://arxiv.org/abs/1802.03903>`_ performance
+    metrics (and some other miscellaneous metrics). To see how these
+    metrics are calculated, check out the respective methods in
+    :class:`.eTaMetrics`.
 
     Args:
-        preds (list[tuple[int, int]]): Predictions as ranges.
-        labels (list[tuple[int, int]]): Labels as ranges.
-        theta_p (float, optional): Precision theta. Defaults to 0.5.
-        theta_r (float, optional): Recall theta. Defaults to 0.1.
+        y_hat (list[tuple[int, int]]): Predictions as list of ranges.
+        y (list[tuple[int, int]]): Labels as list of ranges.
+        theta_p (float, optional): Precision threshold. Only those
+          predictions who overlap with at least `theta_p` with a detected
+          anomaly are counted as correct. Defaults to 0.5.
+        theta_r (float, optional): Recall threshold. Only those anomalies
+          which overlap at least `theta_r` with an correct prediction are
+          counted as detected.  Defaults to 0.1.
 
     Returns:
-        dict[str, float | int]: Returns a mapping with all metrics.
+        dict[str, float | int]: Returns a mapping with all metrics:
+          - ``eta/recall``: eTa recall score
+          - ``eta/recall_detection``: detection score of the recall
+          - ``eta/recall_portion``: portion score of the recall
+          - ``eta/detected_anomalies``: number of detected anomalies
+          - ``eta/precision``: eTa precision score
+          - ``eta/precision_detection``: detection score of the precision
+          - ``eta/precision_portion``: portion score of the precision
+          - ``eta/correct_predictions``: number of correct predictions
+          - ``eta/f1``: f1 score (harmonic mean of precision and recall)
+          - ``eta/TP``: number of true positives (points counted)
+          - ``eta/FP``: number of false positives (points counted)
+          - ``eta/FN``: number of false negatives (points counted)
+          - ``eta/wrong_predictions``: number of wrong predictions
+          - ``eta/missed_anomalies``: number of undetected anomalies
+          - ``eta/anomalies``: total number of anomalies
+          - ``eta/segments``: percentage of detected anomalies
+          - ``point/recall``: point-wise recall (TP / (TP + FN))
+          - ``point/precision``: point-wise precision (TP / (TP + FP))
+          - ``point/f1``: point-wise f1 score
+          - ``point/TP``: number of true positives, correctly classified as 1
+          - ``point/FP``: number of false positive, incorrectly classified as 1
+          - ``point/FN``: number of false negatives, incorrectly classified as
+            0
+          - ``point/anomalies``: total number of anomalies
+          - ``point/detected_anomalies``: number of detected anomalies (at
+            least one point detected)
+          - ``point/segments``: percentage of detected anomalies
+          - ``point_adjust/recall``: point-adjusted recall
+          - ``point_adjust/precision``: point-adjusted precision
+          - ``point_adjust/f1``: point-adjusted f1
+
+    Example:
+
+        >>> import faster_etapr
+        >>> faster_etapr.evaluate_from_ranges(
+        ...     y_hat=[(1, 1), (3, 4), (7, 9), (11, 13)],
+        ...     y=    [(1, 2), (5, 7), (10, 14), (16, 16)],
+        ...     theta_p=0.5,
+        ...     theta_r=0.1,
+        ... )
+        {
+            'eta/recall': 0.3875,
+            'eta/recall_detection': 0.5,
+            'eta/recall_portion': 0.275,
+            'eta/detected_anomalies': 2.0,
+            'eta/precision': 0.46476766302377037,
+            'eta/precision_detection': 0.46476766302377037,
+            'eta/precision_portion': 0.46476766302377037,
+            'eta/correct_predictions': 2.0,
+            'eta/f1': 0.4226312395393011,
+            'eta/TP': 4,
+            'eta/FP': 5,
+            'eta/FN': 7,
+            'eta/wrong_predictions': 2,
+            'eta/missed_anomalies': 2,
+            'eta/anomalies': 4,
+            'eta/segments': 0.499999999999875,
+            'point/recall': 0.45454545454541323,
+            'point/precision': 0.5555555555554939,
+            'point/f1': 0.49999999999945494,
+            'point/TP': 5,
+            'point/FP': 4,
+            'point/FN': 6,
+            'point/anomalies': 4,
+            'point/detected_anomalies': 3.0,
+            'point/segments': 0.75,
+            'point_adjust/recall': 0.9090909090909091,
+            'point_adjust/precision': 0.7142857142857143,
+            'point_adjust/f1': 0.7999999999995071
+        }
+
     """
-    eta = eTa(preds=preds, labels=labels, theta_p=theta_p, theta_r=theta_r)
+    eta = eTaMetrics(
+        preds=preds,
+        labels=labels,
+        theta_p=theta_p,
+        theta_r=theta_r,
+    )
 
     return {
         **eta.scores(),

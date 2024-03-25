@@ -1,7 +1,7 @@
 [project]
-name = "etapr"
+name = "faster-etapr"
 version = "0.1.0"
-description = "Implements the core fuctionality of the eTaPR package."
+description = "Faster of the eTaPR package."
 authors = [
     { name = "GPla", email = "36087062+GPla@users.noreply.github.com" }
 ]
@@ -51,7 +51,7 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/etapr"]
+packages = ["src/faster_etapr"]
 
 [tool.black]
 line-length = 79

@@ -28,18 +28,18 @@ if 'READTHEDOCS' in os.environ:
         )
 
 
-import etapr  # noqa
+import faster_etapr  # noqa
 
 # -- Project information -----------------------------------------------------
 
 
-project = etapr.__title__
-author = etapr.__author__
-copyright = etapr.__copyright__
+project = faster_etapr.__title__
+author = faster_etapr.__author__
+copyright = faster_etapr.__copyright__
 
 
 # The full version, including alpha/beta/rc tags
-version = etapr.__version__
+version = faster_etapr.__version__
 release = version
 
 # -- General configuration ---------------------------------------------------
@@ -76,9 +76,9 @@ html_theme = 'furo'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['_static', 'img']
 
-html_theme_options = {}
+# html_theme_options = {}
 html_show_sourcelink = False
 
 # -- Extensions --------------------------------------------------------------

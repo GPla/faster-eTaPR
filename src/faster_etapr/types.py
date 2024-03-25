@@ -33,10 +33,12 @@ class Metric(NamedTuple):
 
 class eTaRecall(Metric):
     """
-    Container for the ``recall`` of eTa. When calling `eTaRecall._asdict()` the
+    Container for the ``recall`` of
+    `eTa <https://dl.acm.org/doi/10.1145/3477314.3507024>`_. When calling
+    `eTaRecall._asdict()` the
     contents will be mapped to:
 
-    .. code::
+    .. code-block:: python
 
       {
         'eta/recall': value,
@@ -68,10 +70,11 @@ class eTaRecall(Metric):
 
 class eTaPrecision(Metric):
     """
-    Container for the ``precision`` of eTa.  When calling
+    Container for the ``precision`` of
+    `eTa <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.  When calling
     `eTaPrecision._asdict()` the contents will be mapped to:
 
-    .. code::
+    .. code-block:: python
 
       {
         'eta/precision': value,

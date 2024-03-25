@@ -4,7 +4,7 @@ import eTaPR_pkg
 import mlnext
 import numpy as np
 import pytest
-from etapr.etapr import eTa
+from faster_etapr.etapr import eTaMetrics
 
 rng = np.random.default_rng(1337)
 y_hat_y = [
@@ -23,14 +23,14 @@ thetas = [
     for theta_r in np.linspace(0.1, 1, 10)
 ]
 
-SetupType = tuple[eTa, eTaPR_pkg.eTaPR]
+SetupType = tuple[eTaMetrics, eTaPR_pkg.eTaPR]
 
 
 @pytest.fixture(params=list(product(y_hat_y, thetas)), scope='module')
 def setup(request) -> SetupType:
     (y, y_hat), (theta_p, theta_r) = request.param
 
-    etapr_new = eTa.from_preds(
+    etapr_new = eTaMetrics.from_preds(
         y_hat,
         y,
         theta_p=theta_p,
@@ -49,7 +49,7 @@ def setup(request) -> SetupType:
 @pytest.mark.parametrize('theta_p,theta_r', thetas)
 def test_scores(y_hat, y, theta_p, theta_r):
 
-    etapr_new = eTa.from_preds(
+    etapr_new = eTaMetrics.from_preds(
         y_hat,
         y,
         theta_p=theta_p,
@@ -98,7 +98,7 @@ def test_scores(y_hat, y, theta_p, theta_r):
 @pytest.mark.parametrize('theta_p,theta_r', thetas)
 def test_point_scores(y_hat, y, theta_p, theta_r):
 
-    etapr_new = eTa.from_preds(
+    etapr_new = eTaMetrics.from_preds(
         y_hat,
         y,
         theta_p=theta_p,
@@ -144,7 +144,7 @@ def test_point_scores(y_hat, y, theta_p, theta_r):
 @pytest.mark.parametrize('theta_p,theta_r', thetas)
 def test_point_adjust_scores(y_hat, y, theta_p, theta_r):
 
-    etapr_new = eTa.from_preds(
+    etapr_new = eTaMetrics.from_preds(
         y_hat,
         y,
         theta_p=theta_p,

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Changes for the upcoming release can be found in the `"changelog" directory`_ in our repository.
+Changes for the upcoming release can be found in the "changelog" directory in our repository.
 
 ..
    Do *NOT* add changelog entries here!

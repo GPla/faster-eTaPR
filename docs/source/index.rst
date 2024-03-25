@@ -15,7 +15,7 @@ Welcome to eTaPR's documentation!
    :template: custom-module-template.rst
    :recursive:
 
-   etapr
+   faster_etapr
 
 Indices and tables
 ==================
