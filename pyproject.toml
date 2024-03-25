@@ -44,6 +44,7 @@ dev-dependencies = [
     "mypy>=1.9.0",
     "pytest-mock>=3.14.0",
     "tox>=4.14.2",
+    "uv>=0.1.24",
 ]
 
 [tool.hatch.metadata]

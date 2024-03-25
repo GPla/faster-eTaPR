@@ -1,11 +1,9 @@
-eTaPR
-=====
+faster-eTaPR
+============
 
-Implements the core functionality from [saurf4ng/eTaPR](https://github.com/saurf4ng/eTaPR).
+Implements the core functionality from `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_.
 This implementation aims to :
 
-- speed-up the calculation for large input sizes
-- more stability
+- speed-up the calculation, especially for large input sizes
+- more stability for edge-cases
 - cleaner API
-
-- problem with point-adjust

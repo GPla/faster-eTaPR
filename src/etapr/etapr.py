@@ -11,6 +11,12 @@ from .utils import check_floats
 
 eps = 1e-12
 
+__all__ = [
+    'eTa',
+    'calculate_from_preds',
+    'calculate_from_ranges',
+]
+
 
 class eTa:
     """Defines the enhanced time-aware (eTa) precision, recall, and f1.
@@ -652,6 +658,18 @@ def calculate_from_preds(
     theta_p: float = 0.5,
     theta_r: float = 0.1,
 ) -> dict[str, float | int]:
+    """Calculates the eTa, point-wise, and point-adjusted performance
+    metrics (and some other miscellaneous metrics).
+
+    Args:
+        y_hat (npt.NDArray[np.int_]): Predictions (point-wise).
+        y (npt.NDArray[np.int_]): Labels (point-wise).
+        theta_p (float, optional): Precision theta. Defaults to 0.5.
+        theta_r (float, optional): Recall theta. Defaults to 0.1.
+
+    Returns:
+        dict[str, float | int]: Returns a mapping with all metrics.
+    """
     eta = eTa.from_preds(
         y_hat=y_hat,
         y=y,
@@ -673,6 +691,18 @@ def calculate_from_ranges(
     theta_p: float = 0.5,
     theta_r: float = 0.1,
 ) -> dict[str, float | int]:
+    """Calculates the eTa, point-wise, and point-adjusted performance
+    metrics (and some other miscellaneous metrics).
+
+    Args:
+        preds (list[tuple[int, int]]): Predictions as ranges.
+        labels (list[tuple[int, int]]): Labels as ranges.
+        theta_p (float, optional): Precision theta. Defaults to 0.5.
+        theta_r (float, optional): Recall theta. Defaults to 0.1.
+
+    Returns:
+        dict[str, float | int]: Returns a mapping with all metrics.
+    """
     eta = eTa(preds=preds, labels=labels, theta_p=theta_p, theta_r=theta_r)
 
     return {
