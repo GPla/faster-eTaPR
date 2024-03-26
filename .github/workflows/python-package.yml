@@ -28,6 +28,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install .[tests]
+        python -m pip install git+https://github.com/GPla/eTaPR
     - name: Test with pytest
       run: |
         pytest
