@@ -4,14 +4,16 @@ faster-eTaPR
 |docs| |pre-commit| |mypy|
 
 .. |docs| image:: https://readthedocs.org/projects/faster-etapr/badge/?version=latest
-.. _docs: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
+    :target: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 .. |pre-commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
-.. _pre-commit: https://github.com/pre-commit/pre-commit
+    :target: https://github.com/pre-commit/pre-commit
+    :alt: Pre-Commit enabled
 
 .. |mypy| image:: http://www.mypy-lang.org/static/mypy_badge.svg
-.. _mypy: http://mypy-lang.org/
-
+    :target: http://mypy-lang.org/
+    :alt: MyPy checked
 
 Faster implementation (`~200x <#benchmark>`_) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
 The original implementation is `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_ and this implementation is fully tested against it.
