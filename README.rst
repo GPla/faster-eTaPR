@@ -13,7 +13,7 @@ faster-eTaPR
 .. _mypy: http://mypy-lang.org/
 
 
-Faster implementation (:ref:`~200x <benchmark>`) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
+Faster implementation (`~200x <#benchmark>`_) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
 The original implementation is `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_ and this implementation is fully tested against it.
 
 Motivation
