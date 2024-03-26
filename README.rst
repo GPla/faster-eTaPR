@@ -1,11 +1,15 @@
 faster-eTaPR
 ============
 
-|pypi| |docs| |pre-commit| |mypy|
+|pypi| |python| |docs| |pre-commit| |mypy|
 
 .. |pypi| image:: https://img.shields.io/pypi/pyversions/faster-eTaPR
     :target: https://pypi.org/project/faster-etapr/
     :alt: Latest Version
+
+.. |python| image:: https://img.shields.io/badge/python-%3E=3.10-blue
+    :target: https://www.python.org/
+    :alt: Supported Python Versions
 
 .. |docs| image:: https://readthedocs.org/projects/faster-etapr/badge/?version=latest
     :target: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
