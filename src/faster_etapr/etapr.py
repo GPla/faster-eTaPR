@@ -24,126 +24,7 @@ class eTaMetrics:
     f1. Moreover, we can also compute the point-wise and
     `point-adjusted <https://arxiv.org/abs/1802.03903>`_ versions.
 
-    **Motivation**: Anomaly detection is a case of binary classification. As
-    such, we want to assign each data point a label 0 (normal) and 1
-    (anomalous). To measure the effectiveness of a detection method, we can
-    calculate the following performance metrics:
-
-    - Recall(RC): How much of anomalies is detected?
-    - Precision (PR): How many predictions (for anomalies) concern real
-      anomalies?
-    - F1: The harmonic mean of recall and precision, which punishes a large
-      spread.
-    - Segments (SEG): How many anomaly segments are detected?
-
-    For time series data, i.e., a series of observations, we define an anomaly
-    as a subsequence within. Naturally, this opens the possibility to two
-    different approaches of calculation:
-
-    - point-based: the prediction for each data point is compared to the
-      corresponding label
-    - range-based: a sequence predictions for an anomaly segment are compared
-      against a sequence of labels (i.e., an anomaly)
-
-    In a point-based approach, we can categorize the predictions as follows:
-
-    - true positives (TP): Number of label predictions that are correctly
-      identified as anomalous
-    - false positive (FP): Number of labels predictions that are wrongly
-      classified as anomalous
-    - true negatives (TN): Number of label predictions that are correctly
-      identified as normal
-    - false negatives (FN): Number of label predictions that are wrongly
-      classified as normal
-
-    With this in mind, we would calculate the aforementioned performance
-    metrics as follows:
-
-    .. math::
-        :nowrap:
-
-        \\begin{align*}
-        \\mathrm{RC}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
-        \\triangleq \\frac{\\mathrm{TP}}{\\mathrm{TP} + \\mathrm{FN}} \\\\
-
-        \\mathrm{PR}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
-        \\triangleq \\frac{\\mathrm{TP}}{\\mathrm{TP} + \\mathrm{FP}} \\\\
-
-        \\mathrm{F1}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
-        \\triangleq 2 \\frac{\\mathrm{PR}^{\\mathrm{P}} \\cdot
-        \\mathrm{RC}^{\\mathrm{P}}}{\\mathrm{PR}^{\\mathrm{P}} +
-        \\mathrm{RC}^{\\mathrm{P}}} = \\frac{2 \\mathrm{TP}}{2\\mathrm{TP}
-        + \\mathrm{FP} + \\mathrm{FN}}\\\\
-
-        \\mathrm{SEG}^{\\mathrm{P}}(\\tilde{\\mathbf{y}}, \\mathbf{y}) &
-        \\triangleq
-        \\sum_{\\mathbf{A}_i \\in \\mathcal{A}} \\mathbb{1}(
-        \\sum_{\\mathbf{P}_j \\in \\mathcal{P}} |\\mathbf{P}_j \\cap
-        \\mathbf{A}_i| > 0)
-        \\end{align*}
-
-    where :math:`\\mathbf{y}` are the labels and :math:`\\tilde{\\mathbf{y}}`
-    the predictions.
-
-    A common variation to the point-wise approach was proposed by
-    `Xu et al. <https://arxiv.org/abs/1802.03903>`_ called point-adjust (PA).
-    The idea of point-adjust is to mixture of a point- and range-based
-    approach: An anomaly segment :math:`A_i` counts as detected if there is at
-    least one correct prediction in the segment. This is achieved by adjusting
-    the predictions :math:`\\tilde{\\mathbf{y}}` using the labels
-    :math:`\\mathbf{y}` as follows:
-
-    .. math::
-
-        \\tilde{y}^{\\mathrm{PA}}_t = \\begin{cases}
-            1, & \\text{if $\\tilde{y}_t = 1$ or $\\mathbf{x}_t \\in
-            \\mathbf{A}_i$ and $\\underset{\\mathbf{x}_{t'} \\in
-            \\mathbf{A}_i}{\\exists} \\tilde{y}_{t'} = 1$} \\\\
-            0, & \\text{otherwise.} \\\\
-        \\end{cases}
-
-    The following example illustrates the changes that are made to the
-    predictions :math:`\\tilde{\\mathbf{y}}` to obtain the adjusted predictions
-    :math:`\\tilde{\\mathbf{y}}^\\mathrm{PA}` (the changed positions are
-    underlined):
-
-    .. math::
-        :nowrap:
-
-        \\begin{align*}
-            \\text{labels} \;
-            \\mathbf{y}: & [\;0\;0\;1\;1\;1\;0\;0\;1\;1\;0] \\\\
-
-            \\\\
-
-            \\text{predictions} \;
-            \\tilde{\\mathbf{y}}: & [\;1\;0\;0\;0\;1\;1\;0\;0\;0\;0] \\\\
-
-            \\text{adjusted} \;
-            \\tilde{\\mathbf{y}}^\\mathrm{PA}: &
-            [\;1\;0\;\\underline{1}\;\\underline{1}\;1\;1\;0\;0\;0\;0] \\\\
-        \\end{align*}
-
-    Afterward, we can calculate the recall, precision, f1, and segment score
-    in the same way as before.
-
-    There are several problems with this approach. Mainly, that it
-    overestimates the performance and that a higher f1 score does not
-    necessarily constitute in a better detection method. For example, a
-    detection method which only detects each anomaly segment by a single point
-    is scored the same as a method which correctly detects the full segment
-    (before the adjustment). For a more detailed discussion see
-    `Kim et al. <https://arxiv.org/abs/2109.05257>`_.
-
-    Range-based approaches compare a predicted anomaly segment to a real
-    anomaly segment. Thus, it is possible that a prediction :math:`P_j`
-    partially overlaps with an anomaly `A_i`. It can be partially a TP and
-    partially a FP. eTaPR (enhanced time-aware precision and recall)
-    proposed by
-    `Hwang et al. <https://dl.acm.org/doi/abs/10.1145/3477314.3507024>`_
-    tackles this problem in two ways.
-
-    TODO: finish motivation.
+    For a motivation to use eTaPR check out the documentation.
 
     Attributes:
         preds (list[tuple[int, int]]): Predictions as a list of ranges.
@@ -295,8 +176,8 @@ class eTaMetrics:
 
         where :math:`\\mathcal{A}^D` is the set of detected anomalies. An
         anomaly :math:`A_i` belongs to this set, if the overlapped portion
-        with a correct prediction `P_j \\in \\mathcal{P}^C` is greater than
-        `theta_r`. Hence, the detection score :math:`s^\\mathrm{RD}` indicates
+        with a correct prediction :math:`P_j \\in \\mathcal{P}^C` is greater than
+        :math:`\\theta_r`. Hence, the detection score :math:`s^\\mathrm{RD}` indicates
         whether an anomaly :math:`A_i` is detected or not.
 
         The portion score :math:`s^\\mathrm{RP}` is the proportion of an

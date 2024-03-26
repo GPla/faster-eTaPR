@@ -6,6 +6,7 @@ Welcome to eTaPR's documentation!
    :caption: Contents
 
    pages/readme.rst
+   pages/motivation.rst
    pages/changelog.rst
 
 .. rubric:: Modules

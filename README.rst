@@ -1,7 +1,7 @@
 faster-eTaPR
 ============
 
-|docs|_ |pre-commit|_ |mypy|_
+|docs| |pre-commit| |mypy|
 
 .. |docs| image:: https://readthedocs.org/projects/faster-etapr/badge/?version=latest
 .. _docs: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
@@ -13,14 +13,13 @@ faster-eTaPR
 .. _mypy: http://mypy-lang.org/
 
 
-Faster implementation (~100x) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
-The original implementation is `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_.
-This implementation is fully tested against it.
+Faster implementation (:ref:`~200x <benchmark>`) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
+The original implementation is `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_ and this implementation is fully tested against it.
 
 Motivation
 ----------
 
-The motivation behind the eTaPR is that it is enough for a detection method to partially detect an anomaly segment, as along as an human expert can find the anomaly around this prediction.
+The motivation behind the `eTaPR <https://dl.acm.org/doi/10.1145/3477314.3507024>`_ is that it is enough for a detection method to partially detect an anomaly segment, as along as an human expert can find the anomaly around this prediction.
 The following illustration (a recreation from the `paper <https://dl.acm.org/doi/10.1145/3477314.3507024>`_) highlights the four cases which are considered by eTaPR:
 
 .. image:: /img/motivation.png
@@ -29,7 +28,7 @@ The following illustration (a recreation from the `paper <https://dl.acm.org/doi
     :alt: motivation behind eTaPR
 
 1. A *successful* detection: A human expert can likely find the anomaly :math:`A_1` based on the prediction :math:`P_1`.
-2. A *failed* detection: Only a small portion of the prediction :math:`P_2`overlaps with the anomaly :math:`A_2`.
+2. A *failed* detection: Only a small portion of the prediction :math:`P_2` overlaps with the anomaly :math:`A_2`.
 3. A *failed* detection: Most of the prediction :math:`P_3` lies in the range of non-anomalous behavior (prediction starts too early). A human expert will likely regard the prediction :math:`P_3` as incorrect or a false alarm. The prediction :math:`P_3` is *too imprecise* and the anomaly :math:`A_3` is likely to be missed.
 4. A *failed* prediction: The prediction :math:`P_4` mostly overlaps with the anomaly :math:`A_4`, but covers only a small portion of the actual anomaly segment. Thus, a human expert is likely to dismiss the prediction :math:`P_4` as incorrect because the full extend of the anomaly remains hidden. The prediction `P_4` contains *insufficient* information about the anomaly.
 
@@ -102,6 +101,25 @@ We calculate three types of metrics:
 - the `point-adjusted <https://arxiv.org/abs/1802.03903>`_ metrics under
   ``point_adjust/``
 
+
+.. _benchmark:
+
+Benchmark
+---------
+
+A little benchmark with randomly generated inputs (:code:`np.random.randint(0, 2, size=size)`):
+
++---------+-----------+--------------+--------+
+| size    | eTaPR_pkg | faster_etapr | factor |
++=========+===========+==============+========+
+| 1 000   | 0.4090    | 0.0032       | ~125x  |
++---------+-----------+--------------+--------+
+| 10 000  | 35.8264   | 0.1810       | ~198x  |
++---------+-----------+--------------+--------+
+| 20 000  | 148.2670  | 0.6547       | ~226x  |
++---------+-----------+--------------+--------+
+| 100 000 | too long  | 55.04712     |        |
++---------+-----------+--------------+--------+
 
 TODO
 ----
