@@ -1,13 +1,13 @@
 faster-eTaPR
 ============
 
-|pypi| |python| |docs| |pre-commit| |mypy|
+|pypi| |python| |docs| |pre-commit| |mypy| |codecov|
 
-.. |pypi| image:: https://img.shields.io/pypi/pyversions/faster-eTaPR
+.. |pypi| image:: https://badge.fury.io/py/faster-eTaPR.svg
     :target: https://pypi.org/project/faster-etapr/
     :alt: Latest Version
 
-.. |python| image:: https://img.shields.io/badge/python-%3E=3.10-blue
+.. |python| image:: https://img.shields.io/pypi/pyversions/faster-eTaPR
     :target: https://www.python.org/
     :alt: Supported Python Versions
 
@@ -22,6 +22,10 @@ faster-eTaPR
 .. |mypy| image:: http://www.mypy-lang.org/static/mypy_badge.svg
     :target: http://mypy-lang.org/
     :alt: MyPy checked
+
+.. |codecov| image:: https://codecov.io/gh/GPla/faster-eTaPR/graph/badge.svg?token=FVA4W2KHR4
+    :target: https://codecov.io/gh/GPla/faster-eTaPR
+    :alt: Code Coverage
 
 Faster implementation (`~200x <#benchmark>`_) of the enhanced time-aware precision and recall (eTaPR) from  `Hwang et al <https://dl.acm.org/doi/10.1145/3477314.3507024>`_.
 The original implementation is `saurf4ng/eTaPR <https://github.com/saurf4ng/eTaPR>`_ and this implementation is fully tested against it.

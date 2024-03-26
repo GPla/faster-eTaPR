@@ -31,4 +31,9 @@ jobs:
         python -m pip install git+https://github.com/GPla/eTaPR
     - name: Test with pytest
       run: |
-        pytest
+        pytest --cov
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: GPla/faster-eTaPR
