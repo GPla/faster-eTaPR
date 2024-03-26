@@ -11,13 +11,14 @@ dependencies = [
 readme = "README.rst"
 requires-python = ">= 3.10"
 classifiers = [
-    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Software Development :: Libraries"
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: MIT License"
 ]
 keywords = [
     "machine",
