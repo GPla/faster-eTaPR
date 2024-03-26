@@ -1,9 +1,7 @@
 [project]
-name = "faster-etapr"
-version = "0.1.0"
-description = "Faster implementation of github.com/saurf4ng/eTaPR."
+name  = "faster-eTaPR"
 authors = [
-    { name = "GPla", email = "36087062+GPla@users.noreply.github.com" }
+    { name = "Gorden Platz", email = "36087062+GPla@users.noreply.github.com" }
 ]
 dependencies = [
     "numpy>=1.26.4",
@@ -12,6 +10,32 @@ dependencies = [
 ]
 readme = "README.rst"
 requires-python = ">= 3.10"
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries"
+]
+keywords = [
+    "machine",
+    "learning",
+    "anomaly",
+    "detection",
+    "evaluation",
+    "performance",
+    "etapr",
+    "point-adjust",
+    "metrics",
+]
+license = "MIT"
+dynamic = ["version", "description"]
+
+[project.urls]
+Documentation = "https://faster-etapr.readthedocs.io"
+Source = "https://github.com/GPla/faster-eTaPR"
 
 [project.optional-dependencies]
 docs = [
@@ -51,6 +75,12 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/faster_etapr"]
+
+[tool.hatch.version]
+path = "src/faster_etapr/__init__.py"
+
+[tool.hatch.description]
+path = "src/faster_etapr/__init__.py"
 
 [tool.black]
 line-length = 79

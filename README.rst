@@ -1,7 +1,11 @@
 faster-eTaPR
 ============
 
-|docs| |pre-commit| |mypy|
+|pypi| |docs| |pre-commit| |mypy|
+
+.. |pypi| image:: https://img.shields.io/pypi/pyversions/faster-eTaPR
+    :target: https://pypi.org/project/faster-etapr/
+    :alt: Latest Version
 
 .. |docs| image:: https://readthedocs.org/projects/faster-etapr/badge/?version=latest
     :target: https://faster-etapr.readthedocs.io/en/latest/?badge=latest
@@ -27,7 +31,7 @@ The following illustration (a recreation from the `paper <https://dl.acm.org/doi
 .. image:: /img/motivation.png
     :width: 80%
     :align: center
-    :alt: motivation behind eTaPR
+    :alt: Motivation behind eTaPR
 
 1. A *successful* detection: A human expert can likely find the anomaly :math:`A_1` based on the prediction :math:`P_1`.
 2. A *failed* detection: Only a small portion of the prediction :math:`P_2` overlaps with the anomaly :math:`A_2`.
@@ -42,15 +46,15 @@ If you want an in-depth explanation of the calculation, check out the `documenta
 Getting Started
 ---------------
 
-Until this package is released on PyPI, you can install it directly from Github, using `pip <https://github.com/pypa/pip>`_ or `uv <https://github.com/astral-sh/uv>`_:
+Install this package from PyPI using `pip <https://github.com/pypa/pip>`_ or `uv <https://github.com/astral-sh/uv>`_:
 
 .. code::
 
-    pip install git+https://github.com/GPla/faster-eTaPR.git
+    pip install faster-etapr
 
 .. code::
 
-    uv pip install git+https://github.com/GPla/faster-eTaPR.git
+    uv pip install faster-etapr
 
 Now, you run your evaluation in python:
 
