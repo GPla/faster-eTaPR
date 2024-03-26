@@ -1,7 +1,7 @@
 [project]
 name = "faster-etapr"
 version = "0.1.0"
-description = "Faster of the eTaPR package."
+description = "Faster implementation of github.com/saurf4ng/eTaPR."
 authors = [
     { name = "GPla", email = "36087062+GPla@users.noreply.github.com" }
 ]
@@ -24,7 +24,6 @@ docs = [
 tests = [
     "pytest>=8.1.1",
     "pytest-mock>=3.14.0",
-    "etapr-pkg @ git+https://github.com/GPla/eTaPR",
 ]
 
 [build-system]
@@ -76,7 +75,7 @@ force-single-line = true
     filename = "CHANGELOG.rst"
     directory = "changelog"
     template = "changelog/towncrier_template.rst"
-    issue_format = "`#{issue}`__"
+    issue_format = "`#{issue} <https://github.com/saurf4ng/eTaPR/issues/{issue}>`__"
     title_format = "{version} ({project_date})"
     underlines=["-", "-", "^"]
 
