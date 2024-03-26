@@ -13,7 +13,7 @@ Changes for the upcoming release can be found in the "changelog" directory in ou
 .. towncrier release notes start
 
 
-0.1.0 (2024-03-24)
+0.1.0 (2024-03-26)
 ------------------
 
 Initial Release.
