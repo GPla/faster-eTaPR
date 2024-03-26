@@ -9,7 +9,7 @@ from .types import eTaPrecision
 from .types import eTaRecall
 from .utils import check_floats
 
-eps = 1e-12
+eps = 1e-16
 
 __all__ = [
     'eTaMetrics',
@@ -58,11 +58,24 @@ class eTaMetrics:
         self.preds = np.array(preds)
         self.labels = np.array(labels)
 
-        self._pred_weights = np.sqrt(self.preds[:, 1] + 1 - self.preds[:, 0])
+        self._pred_weights = (
+            np.sqrt(self.preds[:, 1] + 1 - self.preds[:, 0])
+            if len(preds) > 0
+            else np.zeros((1,))
+        )
         self._overlap_score_mat_org = self._calculate_overlap_score_mat()
         self._overlap_score_mat = self._overlap_score_mat_org.copy()
-        self._labels_max_score = self.labels[:, 1] + 1 - self.labels[:, 0]
-        self._preds_max_score = self.preds[:, 1] + 1 - self.preds[:, 0]
+
+        self._labels_max_score = (
+            self.labels[:, 1] + 1 - self.labels[:, 0]
+            if len(labels) > 0
+            else np.zeros((1,))
+        )
+        self._preds_max_score = (
+            self.preds[:, 1] + 1 - self.preds[:, 0]
+            if len(preds) > 0
+            else np.zeros((1,))
+        )
 
         self._pruning()
 
@@ -76,6 +89,9 @@ class eTaMetrics:
         """
 
         len_l, len_p = len(self.labels), len(self.preds)
+
+        if len_l == 0 or len_p == 0:
+            return np.zeros((1, 1))
 
         labels_matrix = eo.repeat(self.labels, 'l r -> l p r', p=len_p)
         preds_matrix = eo.repeat(self.preds, 'p r -> l p r', l=len_l)
@@ -507,7 +523,7 @@ class eTaMetrics:
         detected_anomalies = np.where(
             self._overlap_score_mat_org.sum(axis=1) > 0, 1.0, 0
         ).sum()
-        segments = detected_anomalies / anomalies
+        segments = detected_anomalies / (anomalies + eps)
 
         return {
             'point/recall': recall,
@@ -540,7 +556,7 @@ class eTaMetrics:
 
         FPs = self._preds_max_score.sum() - self._overlap_score_mat_org.sum()
 
-        return TPs / (TPs + FPs)
+        return TPs / (TPs + FPs + eps)
 
     def point_adjust_recall(self) -> float:
         """Calculates the `point-adjusted <https://arxiv.org/abs/1802.03903>`_
@@ -559,7 +575,7 @@ class eTaMetrics:
             * self._labels_max_score
         ).sum()
 
-        return TPs / self._labels_max_score.sum()
+        return TPs / (self._labels_max_score.sum() + eps)
 
     def point_adjust_scores(self) -> dict[str, float]:
         """Calculates the `point-adjusted <https://arxiv.org/abs/1802.03903>`_

@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 __title__ = 'faster-eTaPR'
 __description__ = 'Faster implementation of github.com/saurf4ng/eTaPR.'

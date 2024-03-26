@@ -1,10 +1,13 @@
 from itertools import product
+from typing import Callable
 
 import eTaPR_pkg
 import mlnext
 import numpy as np
 import pytest
 from faster_etapr.etapr import eTaMetrics
+from faster_etapr.etapr import evaluate_from_preds
+from faster_etapr.etapr import evaluate_from_ranges
 
 rng = np.random.default_rng(1337)
 y_hat_y = [
@@ -244,3 +247,62 @@ def test_eTaP(setup: SetupType):
     np.testing.assert_almost_equal(r_detection_score, e_detection_score)
     np.testing.assert_almost_equal(r_portion_score, e_portion_score)
     assert r_segments == len(e_segments), f'{r_segments} != {e_segments}'
+
+
+@pytest.mark.parametrize('method', [evaluate_from_preds, evaluate_from_ranges])
+@pytest.mark.parametrize(
+    'y_hat,y',
+    [
+        ([0, 0, 0], [0, 0, 0]),
+        ([0, 1, 0], [0, 0, 0]),
+        ([1, 1, 1], [1, 1, 1]),
+    ],
+)
+def test_scores_edge_cases_methods(
+    y_hat: list[int],
+    y: list[int],
+    method: Callable,
+):
+    exp = max(y)
+    if method == evaluate_from_ranges:
+        result = method(
+            mlnext.find_anomalies(np.array(y_hat)),
+            mlnext.find_anomalies(np.array(y)),
+        )
+    else:
+        result = method(y_hat, y)
+
+    for k, v in result.items():
+        if exp == 1 and k.endswith('/TP'):
+            assert v == len(y), f'{k}: {v} != {len(y)} (len)'
+        elif k.endswith(('/FP', '/wrong_predictions')):
+            if exp == 0:
+                assert v == sum(y_hat), f'{k}: {v} != {sum(y_hat)} (sum)'
+            else:
+                assert v == (
+                    sum(y) - sum(y_hat)
+                ), f'{k}: {v} != {sum(y_hat)} (sum)'
+        elif k.endswith(('/FN', '/missed_anomalies')):
+            assert v == 0
+        else:
+            assert v == exp, f'{k}: {v} != {exp}'
+
+
+@pytest.mark.parametrize(
+    'y_hat,y',
+    [
+        (
+            [0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+            [0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1],
+        ),
+    ],
+)
+def test_scores_methods(y_hat: list[int], y: list[int]):
+
+    result_1 = evaluate_from_ranges(
+        mlnext.find_anomalies(np.array(y_hat)),
+        mlnext.find_anomalies(np.array(y)),
+    )
+    result_2 = evaluate_from_preds(y_hat, y)
+
+    assert result_1 == result_2
