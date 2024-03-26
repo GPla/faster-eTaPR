@@ -122,9 +122,3 @@ A little benchmark with randomly generated inputs (:code:`np.random.randint(0, 2
 +---------+-----------+--------------+--------+
 | 100 000 | too long  | 55.04712     |        |
 +---------+-----------+--------------+--------+
-
-TODO
-----
-
-- Upload to PyPI
-- Github CI
