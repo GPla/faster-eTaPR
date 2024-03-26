@@ -1,5 +1,5 @@
 import pytest
-from etapr.utils import check_floats
+from faster_etapr.utils import check_floats
 
 
 @pytest.mark.parametrize(
