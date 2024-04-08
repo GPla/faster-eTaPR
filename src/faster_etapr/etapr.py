@@ -699,7 +699,7 @@ def evaluate_from_preds(
     Example:
 
         >>> import faster_etapr
-        >>> faster_etapr.evaluate_from_ranges(
+        >>> faster_etapr.evaluate_from_preds(
         ...     y_hat=[0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
         ...     y=    [0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1],
         ...     theta_p=0.5,
